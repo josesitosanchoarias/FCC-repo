@@ -4,7 +4,7 @@ import {
 } from '@mui/material';
 import { Autocomplete } from '@mui/material';
 import cie11Service from '../../../services/cie11Service.js';
-import { createAuditoria, detalle_data } from "../../../services/auditoriaServices";
+import { logAuditAction } from "../../../services/auditoriaServices";
 
 const Diagnostico = ({ formData, setFormData }) => {
   const [selectedDisease, setSelectedDisease] = useState(null);
@@ -95,14 +95,10 @@ const Diagnostico = ({ formData, setFormData }) => {
     
     setFormData(prev => ({ ...prev, diagnostico: diagnosticoData }));
 
-    // Add audit record
-    const data_auditoria = {
-      id_usuario: formData.id_personalsalud || "0",
-      modulo: "Diagnóstico",
-      operacion: "Update",
-      detalle: detalle_data({ diagnostico: diagnosticoData }).updateSql
-    };
-    await createAuditoria(data_auditoria);
+    await logAuditAction('ACTUALIZAR_DIAGNOSTICO', {
+        diagnosticosAnteriores: addedDiseases,
+        diagnosticosNuevos: updatedDiseases
+    });
   };
 
   return (
