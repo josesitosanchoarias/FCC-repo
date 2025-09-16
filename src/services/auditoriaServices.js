@@ -1,6 +1,8 @@
 import axios from "axios";
 import { API_URL } from "./apiConfig";
+import { getCurrentUserId } from "../utils/userUtils";
 
+// UTILITIES
 const formatEcuadorDateTime = (date = new Date()) => {
   return new Intl.DateTimeFormat('es-EC', {
     timeZone: 'America/Guayaquil',
@@ -24,7 +26,48 @@ const formatEcuadorTime = (date = new Date()) => {
   }).format(date);
 };
 
-export const createAuditoria = async (data = {}) => {
+// --- PRIMARY AUDIT FUNCTION ---
+/**
+ * Logs a user action for auditing purposes.
+ * This is the primary, centralized function that all components should use.
+ * @param {string} operacion - A unique identifier for the action (e.g., 'ELIMINAR_EXAMEN').
+ * @param {object} datos - A JSON object containing relevant data for the audit (e.g., { deletedData: examObject }).
+ */
+export const logAuditAction = async (operacion, datos = {}) => {
+  try {
+    const userId = getCurrentUserId();
+    if (!userId) {
+      console.error("Audit Error: User ID not found. Action will not be audited.");
+      return; // Non-blocking if audit fails
+    }
+
+    // Automatically determine module from the operation string for consistency
+    // e.g., 'CONSULTAR_HISTORIA' -> 'Historia'
+    const moduleName = operacion.split('_').length > 1 ? operacion.split('_')[1] : 'General';
+    const formattedModule = moduleName.charAt(0).toUpperCase() + moduleName.slice(1).toLowerCase().replace(/s$/, '');
+
+
+    const auditData = {
+      id_usuario: userId,
+      modulo: formattedModule,
+      operacion: operacion,
+      detalle: JSON.stringify(datos) // Securely stringify the data object
+    };
+
+    // Use the internal createAuditoria function to send the data
+    await createAuditoria(auditData);
+
+  } catch (error) {
+    // Log the audit failure but do not interrupt the user's workflow
+    console.error(`Failed to log audit action '${operacion}':`, error);
+  }
+};
+
+
+// --- INTERNAL AND ADMIN-FACING FUNCTIONS ---
+
+// This function is now "internal" to the service, called by logAuditAction.
+const createAuditoria = async (data = {}) => {
   try {
     const currentDate = new Date();
     const formattedData = {
@@ -34,38 +77,18 @@ export const createAuditoria = async (data = {}) => {
       hora_salida: data.hora_salida || formatEcuadorTime(currentDate)
     };
 
-    console.log("Data being sent to auditoria:", formattedData);
     const response = await axios.post(`${API_URL}/auditoria`, formattedData);
     return response.data;
   } catch (error) {
     console.error("Error creating auditoria:", error.response?.data || error.message);
-    throw error;
+    throw error; // Throw so the caller knows it failed if it needs to
   }
 };
 
-export const generateAuditData = (userId, modulo, operacion, detalle, hora_salida = null) => {
-  const validOperations = [
-    "CREAR", "EDITAR", "ELIMINAR", "CONSULTAR", "UPDATE", "Update",
-    "Crear", "Editar", "Eliminar", "Consultar", "Desactivar",
-    "DESCARGAR", "Cerrar Sesión", "Iniciar Sesión",
-    "Cambiar Contraseña", "Eliminar Cuenta", "ACTIVAR",
-    "DESACTIVAR", "Buscar"
-  ];
-
-  if (!validOperations.includes(operacion)) {
-    console.warn(`Operación no válida: ${operacion}. Usando 'CONSULTAR' por defecto.`);
-    operacion = "CONSULTAR";
-  }
-
-  return {
-    id_usuario: userId,
-    modulo,
-    operacion,
-    detalle,
-    hora_salida
-  };
-};
-
+/*
+  The following functions are likely for a future admin panel to view/manage audits.
+  They are kept for that purpose.
+*/
 export const getAuditorias = async (filters = {}) => {
   try {
     let url = `${API_URL}/auditoria`;
@@ -110,57 +133,3 @@ export const deleteAuditoria = async (id) => {
     throw error;
   }
 };
-
-// Función para generar descripciones detalladas basadas en las tablas
-export const generateDetailedDescription = (operation, tableName, data) => {
-  const tableDescriptions = {
-    atencion_medica: "Atención Médica",
-    auditoria: "Registro de Auditoría",
-    enfermedades: "Registro de Enfermedades",
-    especialidad: "Especialidad Médica",
-    examen: "Examen Médico",
-    historia: "Historia Clínica",
-    paciente: "Información del Paciente",
-    personalsalud: "Personal de Salud",
-    signos_vitales: "Signos Vitales",
-    terapias: "Terapias",
-    tipo_especialidad: "Tipo de Especialidad",
-    tipo_terapia: "Tipo de Terapia",
-    usuario: "Usuario del Sistema"
-  };
-
-  const description = `${operation} en módulo ${tableDescriptions[tableName] || tableName}`;
-  if (data) {
-    return `${description}. Detalles: ${JSON.stringify(data)}`;
-  }
-  return description;
-};
-
-export const generateSqlQueries = (data) => {
-  if (!data?.tabla) {
-    console.error('Error: Invalid data or missing table name');
-    return null;
-  }
-
-  const schema = data.schema ? `${data.schema}.` : '';
-  const tableName = `${schema}${data.tabla}`;
-  
-  const fields = Object.entries(data)
-    .filter(([key]) => !['tabla', 'id', 'schema'].includes(key));
-  
-  const nombres = fields.map(([key]) => key).join(', ');
-  const valores = fields.map(([_, value]) => `'${value}'`).join(', ');
-  const setClause = fields.map(([key, value]) => `${key}='${value}'`).join(', ');
-  const whereClause = data.id ? `id=${data.id}` : '';
-
-  return {
-    insert: `INSERT INTO ${tableName} (${nombres}) VALUES (${valores});`,
-    select: `SELECT ${nombres} FROM ${tableName}`,
-    update: `UPDATE ${tableName} SET ${setClause}${whereClause ? ` WHERE ${whereClause}` : ''};`,
-    delete: whereClause ? `DELETE FROM ${tableName} WHERE ${whereClause};` : '',
-    selectById: whereClause ? `SELECT ${nombres} FROM ${tableName} WHERE ${whereClause};` : '',
-    search: `SELECT * FROM ${tableName} WHERE ${setClause};`
-  };
-};
-
-export const detalle_data = generateSqlQueries;
