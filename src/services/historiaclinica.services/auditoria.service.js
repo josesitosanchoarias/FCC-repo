@@ -15,15 +15,7 @@ class AuditoriaService {
 
   async create(data) {
     try {
-      // Asegurarse de que las fechas estén en el formato correcto
-      const currentDate = new Date();
-      const formattedData = {
-        ...data,
-        fecha: currentDate.toISOString().split('T')[0],
-        hora_ingreso: currentDate.toTimeString().split(' ')[0],
-        hora_salida: currentDate.toTimeString().split(' ')[0]
-      };
-      const res = await models.Auditoria.create(formattedData);
+      const res = await models.Auditoria.create(data);
       return res;
     } catch (error) {
       console.error("Error al crear auditoría:", error);

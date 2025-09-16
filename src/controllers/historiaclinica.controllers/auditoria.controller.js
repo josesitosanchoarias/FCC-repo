@@ -26,17 +26,8 @@ const create = async (req, res) => {
       });
     }
 
-    // Add current timestamp if not provided
-    const currentDate = new Date();
-    const auditData = {
-      ...data,
-      fecha: data.fecha || currentDate.toISOString().split('T')[0],
-      hora_ingreso: data.hora_ingreso || currentDate.toTimeString().split(' ')[0],
-      hora_salida: data.hora_salida || currentDate.toTimeString().split(' ')[0]
-    };
-
-    console.log("Processed audit data:", auditData);
-    const response = await service.create(auditData);
+    console.log("Processed audit data:", data);
+    const response = await service.create(data);
     
     console.log("Audit created successfully:", response);
     res.json({ 
