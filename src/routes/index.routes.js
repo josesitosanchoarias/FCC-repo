@@ -5,6 +5,7 @@ const path = require('path');
 const setupAuthRoutes = require('./auth.routes');
 const setupUploadsRoutes = require('./setupUploadsRoutes');
 
+const setupComunidadRoutes = require('./comunidad.routes');
 const setupOpenAiRoutes = require('./openai.routes'); // Chatbot IA
 
 function routerApi(app) {
@@ -171,6 +172,7 @@ function routerApi(app) {
   setupHistoriaClinicaRoutes(router);
   setupAuthRoutes(router);
   setupCie11Routes(router);
+  setupComunidadRoutes(router);
   setupOpenAiRoutes(router);
 }
 
