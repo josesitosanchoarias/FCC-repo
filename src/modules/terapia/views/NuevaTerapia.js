@@ -36,7 +36,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getPaciente } from '../../../services/pacientesServices';
 import { createTerapia, getTerapiaByPaciente, getLastTerapia } from '../../../services/terapia';
 import { getHistoria, getHistoriaFile } from '../../../services/historiaServices';
-import { createAuditoria,  } from "../../../services/auditoriaServices";
+import { logAuditAction } from "../../../services/auditoriaServices";
 import { getCurrentUserId } from "../../../utils/userUtils";
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
@@ -407,13 +407,7 @@ const SistemaTerapias = () => {
         fecha_modificacion: new Date().toISOString()
       };
 
-      await createAuditoria({
-        id_usuario: loggedInUserId,
-        modulo: "Terapias",
-        operacion: "Crear",
-        detalle: JSON.stringify(detailedDescription),
-        fecha: new Date().toISOString()
-      });
+      await logAuditAction('CREAR_TERAPIA', detailedDescription);
 
       navigate('/Fcc-terapias');
     } catch (error) {

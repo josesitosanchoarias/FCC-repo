@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import PdfGeneratorTerapias from '../../../components/PdfGeneratorTerapias';
 import { API_IMAGE_URL } from "../../../services/apiConfig";
 import TerapiaDetailsDialog from './TerapiaDetailsDialog'; // Asegúrate de que la ruta sea correcta
-import { createAuditoria } from '../../../services/auditoriaServices';
+import { logAuditAction } from '../../../services/auditoriaServices';
 import { getCurrentUserId } from "../../../utils/userUtils";
 
 const tiposTerapia = [
@@ -134,13 +134,7 @@ const TerapiasAnteriores = ({ terapias, tipoTerapia, handleChangeTipoTerapia, ha
           fecha_modificacion: new Date().toISOString()
         };
 
-        await createAuditoria({
-          id_usuario: loggedInUserId,
-          modulo: "Terapias",
-          operacion: "Editar",
-          detalle: JSON.stringify(detailedDescription),
-          fecha: new Date().toISOString()
-        });
+        await logAuditAction('EDITAR_TERAPIA', detailedDescription);
 
         setFilteredTerapias(prevTerapias => 
           prevTerapias.map(t => t.id_terapia === updatedTerapia.id_terapia ? updatedTerapia : t)
@@ -178,13 +172,7 @@ const TerapiasAnteriores = ({ terapias, tipoTerapia, handleChangeTipoTerapia, ha
           fecha_modificacion: new Date().toISOString()
         };
 
-        await createAuditoria({
-          id_usuario: loggedInUserId,
-          modulo: "Terapias",
-          operacion: "Eliminar",
-          detalle: JSON.stringify(detailedDescription),
-          fecha: new Date().toISOString()
-        });
+        await logAuditAction('ELIMINAR_TERAPIA', detailedDescription);
 
         handleCloseDeleteDialog();
         setFilteredTerapias(prevTerapias => 

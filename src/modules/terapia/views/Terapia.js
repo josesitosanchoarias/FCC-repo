@@ -11,7 +11,7 @@ import TerapiasTabs from '../components/TerapiasTabs';
 import TerapiasAnteriores from '../components/TerapiasAnteriores';
 import AsistenciaTerapias from '../components/AsistenciaTerapias';
 import { getPaciente } from '../../../services/pacientesServices';
-import { createAuditoria } from '../../../services/auditoriaServices';
+import { logAuditAction } from '../../../services/auditoriaServices';
   import { getCurrentUserId } from "../../../utils/userUtils";
 
 
@@ -102,13 +102,7 @@ export default function Terapias() {
         fecha_modificacion: new Date().toISOString()
       };
 
-      await createAuditoria({
-        id_usuario: loggedInUserId,
-        modulo: "Terapias",
-        operacion: "Editar",
-        detalle: JSON.stringify(detailedDescription),
-        fecha: new Date().toISOString()
-      });
+      await logAuditAction('EDITAR_TERAPIA', detailedDescription);
 
       setTerapias(prevTerapias => 
         prevTerapias.map(terapia => 
@@ -148,13 +142,7 @@ export default function Terapias() {
         fecha_modificacion: new Date().toISOString()
       };
 
-      await createAuditoria({
-        id_usuario: loggedInUserId,
-        modulo: "Terapias",
-        operacion: "Eliminar",
-        detalle: JSON.stringify(detailedDescription),
-        fecha: new Date().toISOString()
-      });
+      await logAuditAction('ELIMINAR_TERAPIA', detailedDescription);
 
       setTerapias(prevTerapias => prevTerapias.filter(terapia => terapia.id_terapia !== terapiaId));
     } catch (error) {
