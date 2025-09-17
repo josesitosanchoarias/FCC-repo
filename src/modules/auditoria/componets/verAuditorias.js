@@ -76,8 +76,9 @@ const VerAuditorias = () => {
       // Improved user filter
       if (filterUser.trim()) {
         const searchTerm = filterUser.trim().toLowerCase();
-        userMatch = auditoria.id_usuario && (
-          auditoria.id_usuario.toString().toLowerCase().includes(searchTerm)
+        userMatch = auditoria.usuario && (
+          auditoria.usuario.nombre_usuario.toLowerCase().includes(searchTerm) ||
+          auditoria.usuario.apellido_usuario.toLowerCase().includes(searchTerm)
         );
       }
 

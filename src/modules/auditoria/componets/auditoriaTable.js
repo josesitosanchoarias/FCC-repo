@@ -173,7 +173,7 @@ const AuditoriasTable = ({ auditorias, loading }) => {
                           {formatDate(auditoria.fecha)}
                         </StyledTableCell>
                         <StyledTableCell>{auditoria.id_auditoria}</StyledTableCell>
-                        <StyledTableCell>{auditoria.id_usuario}</StyledTableCell>
+                        <StyledTableCell>{auditoria.usuario_auditoria ? `${auditoria.usuario_auditoria.nombre_usuario} ${auditoria.usuario_auditoria.apellido_usuario}` : `Usuario ID: ${auditoria.id_usuario}`}</StyledTableCell>
                         <StyledTableCell>{auditoria.operacion}</StyledTableCell>
                         <StyledTableCell>{auditoria.modulo}</StyledTableCell>
                         <StyledTableCell>
