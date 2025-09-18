@@ -35,7 +35,6 @@ class PersonaService  {
       const res = await models.Persona.findAll({
         include: [{
           model: models.Interaccion,
-          as: 'interaccionesAsociadas',
           where: { id_interaccion: idInteraccion }
         }]
       });

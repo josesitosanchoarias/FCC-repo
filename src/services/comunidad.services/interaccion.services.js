@@ -10,7 +10,9 @@ class InteraccionService  {
     }
 
     async findOne(id) {
-      const res = await models.Interaccion.findByPk(id);
+      const res = await models.Interaccion.findByPk(id, {
+        include: ['personasAsociadas']
+      });
       return res;
     }
 
@@ -26,13 +28,25 @@ class InteraccionService  {
     }
 
     async create(data) {
-      const res = await models.Interaccion.create(data);
-      return res;
+      const { personas, ...interaccionData } = data;
+      const newInteraccion = await models.Interaccion.create(interaccionData);
+
+      if (personas && personas.length > 0) {
+        await newInteraccion.setPersonasAsociadas(personas);
+      }
+
+      return newInteraccion;
     }
 
     async update(id, data) {
+      const { personas, ...interaccionData } = data;
       const model = await this.findOne(id);
-      const res = await model.update(data);
+      const res = await model.update(interaccionData);
+
+      if (personas) {
+        await model.setPersonasAsociadas(personas);
+      }
+
       return res;
     }
 
