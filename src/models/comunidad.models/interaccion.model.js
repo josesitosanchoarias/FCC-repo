@@ -16,7 +16,10 @@ class Interaccion extends Model {
 	//------ belongsToMany
     static associate(models) {
         Interaccion.belongsToMany(models.Persona, {
-            through: 'persona_interaccion',
+            through: models.PersonaInteraccion,
+            foreignKey: 'interaccion_id',
+            otherKey: 'persona_id',
+            as: 'personasAsociadas',
         });
     }
 

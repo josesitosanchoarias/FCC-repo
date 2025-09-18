@@ -23,7 +23,9 @@ class Persona extends Model {
             as: 'tipo_persona_persona',
         });
 	Persona.belongsToMany(models.Interaccion, {
-            through: 'persona_interaccion'
+            through: models.PersonaInteraccion,
+            foreignKey: 'persona_id',
+            otherKey: 'interaccion_id',
         });
     }
 
