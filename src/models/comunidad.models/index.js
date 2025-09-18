@@ -5,6 +5,7 @@ const { Parroquia, ParroquiaSchema } = require('./parroquia.model');
 const { TipoPersona, TipoPersonaSchema } = require('./tipo_persona.model');
 const { Persona, PersonaSchema } = require('./persona.model');
 const { Interaccion, InteraccionSchema } = require('./interaccion.model');
+const { PersonaInteraccion, PersonaInteraccionSchema } = require('./persona_interaccion.model');
 
 
 function setupComunidadModels(sequelize) {
@@ -17,14 +18,15 @@ function setupComunidadModels(sequelize) {
    TipoPersona.init(TipoPersonaSchema, TipoPersona.config(sequelize));
    Persona.init(PersonaSchema, Persona.config(sequelize));
    Interaccion.init(InteraccionSchema, Interaccion.config(sequelize));
+   PersonaInteraccion.init(PersonaInteraccionSchema, PersonaInteraccion.config(sequelize));
 
    //association
    Provincia.associate({ Canton });
    Canton.associate({ Provincia, Parroquia });
    Parroquia.associate({ Canton,Persona});
    TipoPersona.associate({ Persona});
-   Persona.associate({ Parroquia, TipoPersona, Interaccion});
-   Interaccion.associate({ Persona});
+   Persona.associate({ Parroquia, TipoPersona, Interaccion, PersonaInteraccion});
+   Interaccion.associate({ Persona, PersonaInteraccion});
 
 }
 
