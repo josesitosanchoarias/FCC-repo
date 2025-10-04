@@ -59,6 +59,23 @@ class UsuarioService  {
         await model.destroy();
         return { deleted: true };
     }
+
+    async changePassword(id, oldPassword, newPassword) {
+        const user = await this.findOne(id);
+        if (!user) {
+            return { success: false, message: 'Usuario no encontrado' };
+        }
+
+        const match = await bcrypt.compare(oldPassword, user.password_usuario);
+        if (!match) {
+            return { success: false, message: 'Contraseña incorrecta' };
+        }
+
+        const hashedPassword = await this.encryptPassword(newPassword);
+        await this.update(id, { password_usuario: hashedPassword });
+
+        return { success: true, message: 'Contraseña actualizada correctamente' };
+    }
 };
 
 module.exports = UsuarioService;

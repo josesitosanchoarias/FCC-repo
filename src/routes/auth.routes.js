@@ -1,6 +1,7 @@
 const express = require('express'); 
 const router = express.Router();
-const { validateAndReturnUserData } = require('../middleware/verifyToken');
+const { validateAndReturnUserData, verifyToken } = require('../middleware/verifyToken');
+const { changePassword } = require('../controllers/auth.controller');
 
 /**
  * @swagger
@@ -43,6 +44,7 @@ const { validateAndReturnUserData } = require('../middleware/verifyToken');
  */
 function setupAuthRoutes(router) {
   router.post('/auth', validateAndReturnUserData);
+  router.post('/change-password', verifyToken, changePassword);
 }
 
 module.exports = setupAuthRoutes;
