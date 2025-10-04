@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_URL } from './apiConfig';
+import { logAuditAction } from './auditoriaServices';
 
 // Get all pacientes
 export const getPacientes = async () => {
@@ -31,6 +32,7 @@ export const createPaciente = async (formData) => {
                 'Content-Type': 'multipart/form-data'
             }
         });
+        await logAuditAction('CREAR_PACIENTE', { newData: formData });
         return response.data;
     } catch (error) {
         console.error('Error creating paciente:', error);
@@ -47,6 +49,7 @@ export const updatePaciente = async (id, formData) => {
             }
         });
         
+        await logAuditAction('ACTUALIZAR_PACIENTE', { pacienteId: id, updatedData: formData });
         console.log('Service response:', response);
         
         if (response.status === 200 && response.data) {
@@ -64,6 +67,7 @@ export const updatePaciente = async (id, formData) => {
 export const deletePaciente = async (pacienteId) => {
     try {
         const response = await axios.delete(`${API_URL}/paciente/${pacienteId}`);
+        await logAuditAction('ELIMINAR_PACIENTE', { pacienteId: pacienteId });
         return response.data;
     } catch (error) {
         console.error('Error deleting paciente:', error);
@@ -75,6 +79,7 @@ export const deletePaciente = async (pacienteId) => {
 export const deleteLogicalPaciente = async (pacienteId) => {
     try {
         const response = await axios.put(`${API_URL}/paciente/estado/${pacienteId}`);
+        await logAuditAction('ELIMINAR_LOGICO_PACIENTE', { pacienteId: pacienteId });
         return response.data;
     } catch (error) {
         console.error('Error changing state paciente:', error);

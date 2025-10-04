@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {API_URL} from './apiConfig';
+import { logAuditAction } from './auditoriaServices';
 
 export const getTerapias = async (pacienteId) => {
     try {
@@ -18,6 +19,7 @@ export const createTerapia = async (formData) => {
           'Content-Type': 'multipart/form-data',
         },
       });
+      await logAuditAction('CREAR_TERAPIA', { newData: formData });
       return response.data;
     } catch (error) {
       console.error('Error creating terapia:', error);
@@ -32,6 +34,7 @@ export const createTerapia = async (formData) => {
             'Content-Type': 'multipart/form-data'
         }
     });
+      await logAuditAction('ACTUALIZAR_TERAPIA', { terapiaId: terapiaId, updatedData: terapiaData });
       return response.data;
     } catch (error) {
       console.error('Error updating terapia:', error);
@@ -72,10 +75,10 @@ export const getLastTerapia = async (pacienteId) => {
 export const deleteTerapia = async (terapiaId) => {
     try {
         const response = await axios.delete(`${API_URL}/terapias/${terapiaId}`);
+        await logAuditAction('ELIMINAR_TERAPIA', { terapiaId: terapiaId });
         return response.data;
     } catch (error) {
         console.error('Error deleting terapia:', error);
         throw error;
     }
 }
-

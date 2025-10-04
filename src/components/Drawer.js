@@ -115,6 +115,7 @@ export default function ResponsiveDrawer({ open, onClose }) {
   const menuItems = useMemo(() => [
     { text: 'Menu Principal', path: '/fcc-menu-principal', icon: <HomeIcon /> },
     { text: 'Paciente', path: '/fcc-pacientes', icon: <FaceIcon /> },
+    
     { 
       text: 'Historia Clínica', 
       icon: <AssignmentTurnedInIcon />,
@@ -131,7 +132,8 @@ export default function ResponsiveDrawer({ open, onClose }) {
       subItems: [
         { text: 'Usuarios', path: '/fcc-usuarios', icon: <GroupIcon /> },
         { text: 'Personal Salud', path: '/fcc-personal-salud', icon: <MedicalInformationIcon /> },
-        {text: 'Auditoría', path: '/fcc-auditoria', icon: <AssignmentTurnedInIcon/>}
+        {text: 'Auditoría', path: '/fcc-auditoria', icon: <AssignmentTurnedInIcon/>},
+        { text: 'Comunidad', path: '/fcc-comunidad', icon: <GroupIcon /> },
       ]
     },
     { text: 'Perfil', path: '/perfil', icon: <AccountCircleIcon /> },
@@ -243,7 +245,7 @@ export default function ResponsiveDrawer({ open, onClose }) {
             </List>
           </Collapse>
         )}
-        {(item.text === 'Paciente' || item.text === 'Historia Clínica' || (item.text === 'Administración' && isAdmin)) && !isLastItem && (
+        {(item.text === 'Paciente' || item.text === 'Comunidad' || item.text === 'Historia Clínica' || (item.text === 'Administración' && isAdmin)) && !isLastItem && (
           <Divider sx={{ my: 1 }} />
         )}
       </React.Fragment>

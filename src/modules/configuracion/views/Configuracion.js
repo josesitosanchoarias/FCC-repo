@@ -15,6 +15,7 @@ import {
   DialogActions,
   TextField,
   Switch,
+  Alert,
 } from "@mui/material";
 import {
   LockOutlined as LockIcon,
@@ -25,10 +26,17 @@ import Drawer from "../../../components/Drawer";
 import NavbarAdmin from "../../../components/NavbarAdmin";
 import { logAuditAction } from "../../../services/auditoriaServices";
 import { getCurrentUserId } from "../../../utils/userUtils";
+import { changePassword } from "../../../services/authServices";
+
 const Configuracion = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
@@ -38,61 +46,82 @@ const Configuracion = () => {
     try {
       const loggedInUserId = getCurrentUserId();
       if (!loggedInUserId) {
-        throw new Error('No user logged in');
+        throw new Error("No user logged in");
       }
 
       // Implementar lógica para eliminar cuenta
       const detailedDescription = {
         accion: "ELIMINAR",
-        tabla: 'usuarios',
+        tabla: "usuarios",
         id_registro: loggedInUserId,
         datos_modificados: {
-          estado_anterior: { id_usuario: loggedInUserId, estado: 'activo' },
-          estado_nuevo: { id_usuario: loggedInUserId, estado: 'eliminado' },
+          estado_anterior: { id_usuario: loggedInUserId, estado: "activo" },
+          estado_nuevo: { id_usuario: loggedInUserId, estado: "eliminado" },
           detalles_eliminacion: {
             tipo_operacion: "Eliminación de Cuenta",
             fecha_eliminacion: new Date().toISOString(),
-            motivo: "Solicitud del usuario"
-          }
+            motivo: "Solicitud del usuario",
+          },
         },
-        fecha_modificacion: new Date().toISOString()
+        fecha_modificacion: new Date().toISOString(),
       };
 
-      await logAuditAction('ELIMINAR_CUENTA_CONFIG', detailedDescription);
+      await logAuditAction("ELIMINAR_CUENTA_CONFIG", detailedDescription);
       setOpenDeleteDialog(false);
     } catch (error) {
-      console.error('Error al eliminar cuenta:', error);
+      console.error("Error al eliminar cuenta:", error);
     }
   };
 
   const handleChangePassword = async () => {
+    setError("");
+    setSuccess("");
+
+    if (newPassword !== confirmPassword) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
     try {
       const loggedInUserId = getCurrentUserId();
       if (!loggedInUserId) {
-        throw new Error('No user logged in');
+        throw new Error("No user logged in");
       }
 
-      // Implementar lógica para cambiar contraseña
-      const detailedDescription = {
-        accion: "EDITAR",
-        tabla: 'usuarios',
-        id_registro: loggedInUserId,
-        datos_modificados: {
-          estado_anterior: { id_usuario: loggedInUserId },
-          estado_nuevo: { id_usuario: loggedInUserId },
-          detalles_cambios: {
-            tipo_operacion: "Cambio de Contraseña",
-            fecha_modificacion: new Date().toISOString(),
-            campo_modificado: "password_usuario"
-          }
-        },
-        fecha_modificacion: new Date().toISOString()
-      };
+      const response = await changePassword({
+        oldPassword: currentPassword,
+        newPassword: newPassword,
+      });
 
-      await logAuditAction('CAMBIAR_CONTRASENA_CONFIG', detailedDescription);
-      setOpenPasswordDialog(false);
+      if (response.success) {
+        setSuccess(response.message);
+        const detailedDescription = {
+          accion: "EDITAR",
+          tabla: "usuarios",
+          id_registro: loggedInUserId,
+          datos_modificados: {
+            estado_anterior: { id_usuario: loggedInUserId },
+            estado_nuevo: { id_usuario: loggedInUserId },
+            detalles_cambios: {
+              tipo_operacion: "Cambio de Contraseña",
+              fecha_modificacion: new Date().toISOString(),
+              campo_modificado: "password_usuario",
+            },
+          },
+          fecha_modificacion: new Date().toISOString(),
+        };
+
+        await logAuditAction("CAMBIAR_CONTRASENA_CONFIG", detailedDescription);
+        setTimeout(() => {
+          setOpenPasswordDialog(false);
+          setSuccess("");
+        }, 2000);
+      } else {
+        setError(response.message);
+      }
     } catch (error) {
-      console.error('Error al cambiar contraseña:', error);
+      console.error("Error al cambiar contraseña:", error);
+      setError("Error al cambiar la contraseña");
     }
   };
 
@@ -171,6 +200,8 @@ const Configuracion = () => {
       <Dialog open={openPasswordDialog} onClose={() => setOpenPasswordDialog(false)}>
         <DialogTitle>Cambiar contraseña</DialogTitle>
         <DialogContent>
+          {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="success">{success}</Alert>}
           <TextField
             autoFocus
             margin="dense"
@@ -179,6 +210,8 @@ const Configuracion = () => {
             type="password"
             fullWidth
             variant="outlined"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
           />
           <TextField
             margin="dense"
@@ -187,6 +220,8 @@ const Configuracion = () => {
             type="password"
             fullWidth
             variant="outlined"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
           />
           <TextField
             margin="dense"
@@ -195,6 +230,8 @@ const Configuracion = () => {
             type="password"
             fullWidth
             variant="outlined"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </DialogContent>
         <DialogActions>

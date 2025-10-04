@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import {API_URL} from './apiConfig';
+import { logAuditAction } from './auditoriaServices';
 
 export const getExamenes = async () => {
     try {
@@ -29,6 +30,7 @@ export const createExamen = async (data) => {
                 'Content-Type': 'multipart/form-data'
             }
         });
+        await logAuditAction('CREAR_EXAMEN', { newData: data });
         return response.data;
     } catch (error) {
         console.error('Error creating examen:', error);
@@ -43,6 +45,7 @@ export const updateExamen = async (examenId, data) => {
                 'Content-Type': 'multipart/form-data'
             }
         });
+        await logAuditAction('ACTUALIZAR_EXAMEN', { examenId: examenId, updatedData: data });
         return response.data;
     } catch (error) {
         console.error('Error updating examen:', error);
@@ -53,6 +56,7 @@ export const updateExamen = async (examenId, data) => {
 export const deleteExamen = async (examenId) => {
     try {
         const response = await axios.delete(`${API_URL}/examen/${examenId}`);
+        await logAuditAction('ELIMINAR_EXAMEN', { examenId: examenId });
         return response.data;
     } catch (error) {
         console.error('Error deleting examen:', error);

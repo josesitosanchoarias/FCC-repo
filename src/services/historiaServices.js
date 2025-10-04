@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_URL } from './apiConfig'; // Remove BASE_API_URL since it's not used
+import { logAuditAction } from './auditoriaServices';
 
 export const getHistoria = async (historiaId) => {
   try {
@@ -40,6 +41,7 @@ export const createHistoria = async (data) => {
         'Content-Type': 'application/json' // Changed from multipart/form-data
       }
     });
+    await logAuditAction('CREAR_HISTORIA', { newData: data });
     return response.data;
   } catch (error) {
     console.error('Error creating historia:', error);
@@ -54,6 +56,7 @@ export const updateHistoria = async (historiaId, data) => {
         'Content-Type': 'application/json'
       }
     });
+    await logAuditAction('ACTUALIZAR_HISTORIA', { historiaId: historiaId, updatedData: data });
     return response.data;
   } catch (error) {
     console.error('Error updating historia:', error);

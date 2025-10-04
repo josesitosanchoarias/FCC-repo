@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logAuditAction } from './auditoriaServices';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/fcc';
 
@@ -31,10 +32,12 @@ const getInteraccionesByPersona = (idPersona) => {
 };
 
 const createPersona = (persona) => {
+  logAuditAction('CREAR_PERSONA', { newData: persona });
   return axios.post(`${API_URL}/persona`, persona);
 };
 
 const createInteraccion = (interaccion) => {
+  logAuditAction('CREAR_INTERACCION', { newData: interaccion });
   return axios.post(`${API_URL}/interaccion`, interaccion);
 };
 
@@ -43,6 +46,7 @@ const getInteraccionById = (id) => {
 };
 
 const updateInteraccion = (id, interaccion) => {
+  logAuditAction('ACTUALIZAR_INTERACCION', { interaccionId: id, updatedData: interaccion });
   return axios.put(`${API_URL}/interaccion/${id}`, interaccion);
 };
 
@@ -51,6 +55,7 @@ const getPersonasByInteraccion = (idInteraccion) => {
 };
 
 const deletePersona = (id) => {
+  logAuditAction('ELIMINAR_PERSONA', { personaId: id });
   return axios.delete(`${API_URL}/persona/${id}`);
 };
 

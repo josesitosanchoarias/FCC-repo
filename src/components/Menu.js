@@ -39,6 +39,12 @@ const menuData = [
     roles: ["admin", "doctor", "personal_salud"],
   },
   {
+    nombre_menu: "Comunidad",
+    url: "/fcc-comunidad",
+    icon: <GroupIcon />,
+    roles: ["admin"],
+  },
+  {
     nombre_menu: "Personal",
     url: "/fcc-personal-salud",
     icon: <LocalHospitalIcon />,

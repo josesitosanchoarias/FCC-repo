@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {API_URL} from './apiConfig';
+import { logAuditAction } from './auditoriaServices';
 
 // Get all pacientes
 export const getPersonalSalud = async () => {
@@ -52,6 +53,7 @@ export const getPersonalSaludSimpleId = async (personalId) => {
 export const createPersonalSalud = async (personalData) => {
     try {
         const response = await axios.post(`${API_URL}/personalsalud`, personalData);
+        await logAuditAction('CREAR_PERSONAL_SALUD', { newData: personalData });
         return response.data;
     } catch (error) {
         console.error('Error creating personal:', error);
@@ -63,6 +65,7 @@ export const createPersonalSalud = async (personalData) => {
 export const updatePersonalSalud = async (personalId, personalData) => {
     try {
         const response = await axios.put(`${API_URL}/personalsalud/${personalId}`, personalData);
+        await logAuditAction('ACTUALIZAR_PERSONAL_SALUD', { personalId: personalId, updatedData: personalData });
         return response.data;
     } catch (error) {
         console.error('Error updating personal:', error);
@@ -74,6 +77,7 @@ export const updatePersonalSalud = async (personalId, personalData) => {
 export const deletePersonalSalud = async (personalId) => {
     try {
         const response = await axios.delete(`${API_URL}/personalsalud/${personalId}`);
+        await logAuditAction('ELIMINAR_PERSONAL_SALUD', { personalId: personalId });
         return response.data;
     } catch (error) {
         console.error('Error deleting personal:', error);
@@ -84,6 +88,7 @@ export const deletePersonalSalud = async (personalId) => {
 export const deleteLogicalPersonalSalud = async(personalId) => {
     try {
         const response = await axios.put(`${API_URL}/personalsalud/estado/${personalId}`);
+        await logAuditAction('ELIMINAR_LOGICO_PERSONAL_SALUD', { personalId: personalId });
         return response.data;
     } catch (error) {
         console.error('Error changing state personal:', error);

@@ -81,3 +81,18 @@ export const isAuthenticated = () => {
     const token = getAuthToken();
     return !!token;
 };
+
+export const changePassword = async (passwords) => {
+    try {
+        const token = getAuthToken();
+        const response = await axios.post(`${API_URL}/auth/change-password`, passwords, {
+            headers: {
+                'token': token
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error changing password:', error);
+        throw error;
+    }
+};

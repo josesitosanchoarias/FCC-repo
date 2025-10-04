@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import {API_URL} from './apiConfig';
+import { logAuditAction } from './auditoriaServices';
 
 export const getLastSignosVitales = async (pacienteId) => {
     try {
@@ -15,6 +16,7 @@ export const getLastSignosVitales = async (pacienteId) => {
 export const createSignosVitales = async (data) => {
     try {
         const response = await axios.post(`${API_URL}/signos_vitales`, data);
+        await logAuditAction('CREAR_SIGNOS_VITALES', { newData: data });
         return response.data;
     } catch (error) {
         console.error('Error creating signos vitales:', error);
@@ -46,6 +48,7 @@ export const createAtencion = async(data) => {
     try{
         console.log(data);
        const response = await axios.post(`${API_URL}/atencion`, data);
+       await logAuditAction('CREAR_ATENCION', { newData: data });
         return response.data;
 
     }

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {API_URL} from './apiConfig';
+import { logAuditAction } from './auditoriaServices';
 
 
 export const getUsuarios = async () => {
@@ -25,6 +26,7 @@ export const getUsuario = async (userId) => {
 export const createUsuario = async (data) => {
     try {
         const response = await axios.post(`${API_URL}/users`, data);
+        await logAuditAction('CREAR_USUARIO', { newData: data });
         return response.data;
     } catch (error) {
         console.error('Error creating usuario:', error);
@@ -35,6 +37,7 @@ export const createUsuario = async (data) => {
 export const updateUsuario = async (userId, data) => {
     try {
         const response = await axios.put(`${API_URL}/users/${userId}`, data);
+        await logAuditAction('ACTUALIZAR_USUARIO', { userId: userId, updatedData: data });
         return response.data;
     } catch (error) {
         console.error('Error updating usuario:', error);
@@ -45,10 +48,10 @@ export const updateUsuario = async (userId, data) => {
 export const deleteUsuario = async (userId) => {
     try {
         const response = await axios.delete(`${API_URL}/users/${userId}`);
+        await logAuditAction('ELIMINAR_USUARIO', { userId: userId });
         return response.data;
     } catch (error) {
         console.error('Error deleting usuario:', error);
         throw error;
     }
 }
-
