@@ -68,6 +68,11 @@ const updatePersona = (id, persona) => {
   return axios.put(`${API_URL}/persona/${id}`, persona);
 };
 
+const deleteInteraccion = (id) => {
+  logAuditAction('ELIMINAR_INTERACCION', { interaccionId: id });
+  return axios.delete(`${API_URL}/interaccion/${id}`);
+};
+
 const comunidadService = {
   getCantones,
   getParroquias,
@@ -84,6 +89,7 @@ const comunidadService = {
   deletePersona,
   getPersonaById,
   updatePersona,
+  deleteInteraccion,
 };
 
 export default comunidadService;

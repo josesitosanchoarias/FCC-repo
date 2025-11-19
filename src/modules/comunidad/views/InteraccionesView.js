@@ -31,15 +31,25 @@ const Interacciones = () => {
 
   const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
 
-  useEffect(() => {
-    setCurrentMenu('Interacciones');
+  const fetchInteracciones = () => {
     comunidadService.getInteracciones().then((response) => {
       setInteracciones(response.data);
     });
+  };
+
+  useEffect(() => {
+    setCurrentMenu('Interacciones');
+    fetchInteracciones();
   }, [setCurrentMenu]);
 
   const handleExpandClick = (interaccionId) => {
     setExpandedInteraccionId(expandedInteraccionId === interaccionId ? null : interaccionId);
+  };
+
+  const handleDelete = (id) => {
+    comunidadService.deleteInteraccion(id).then(() => {
+      fetchInteracciones();
+    });
   };
 
   return (
@@ -115,9 +125,18 @@ const Interacciones = () => {
                         variant="contained"
                         color="secondary"
                         size="small"
+                        sx={{ mr: 1 }}
                         onClick={() => navigate(`/fcc-comunidad/interacciones/${interaccion.id_interaccion}/editar`)}
                       >
                         Editar
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        onClick={() => handleDelete(interaccion.id_interaccion)}
+                      >
+                        Eliminar
                       </Button>
                       <IconButton
                         onClick={() => handleExpandClick(interaccion.id_interaccion)}
