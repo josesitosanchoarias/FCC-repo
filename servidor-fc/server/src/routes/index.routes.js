@@ -6,6 +6,11 @@ const setupAuthRoutes = require('./auth.routes');
 const setupUploadsRoutes = require('./setupUploadsRoutes');
 
 const setupComunidadRoutes = require('./comunidad.routes');
+const setupCapacitacionRoutes = require('./capacitaciones.routes')
+const setupChatClienteRoutes = require('./chatcliente.routes')
+const setupChatServidorRoutes = require('./chatservidor.routes')
+const setupDocumentacionRoutes = require('./documentacion.routes')
+const setupDonacionesRoutes = require('./donaciones.routes')
 const setupOpenAiRoutes = require('./openai.routes'); // Chatbot IA
 
 function routerApi(app) {
@@ -173,6 +178,11 @@ function routerApi(app) {
   setupAuthRoutes(router);
   setupCie11Routes(router);
   setupComunidadRoutes(router);
+  setupCapacitacionRoutes(router)
+  setupChatClienteRoutes(router)
+  setupChatServidorRoutes(router)
+  setupDocumentacionRoutes(router)
+  setupDonacionesRoutes(router)
   setupOpenAiRoutes(router);
 }
 
